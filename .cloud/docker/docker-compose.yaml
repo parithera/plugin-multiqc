@@ -1,19 +1,19 @@
 services:
-  plugin-fastqc:
+  plugin-multiqc:
     # platform: linux/amd64
     build:
       context: ../../backend
-      dockerfile: plugins/fastqc/.cloud/docker/Dockerfile
+      dockerfile: plugins/multiqc/.cloud/docker/Dockerfile
       target: plugin-dev
       args:
-        - PLUGINNAME=fastqc
-    image: parithera/fastqc-dev:latest
+        - PLUGINNAME=multiqc
+    image: parithera/multiqc-dev:latest
     restart: always
     volumes:
       - ../../backend:/codeclarity
       - ../../private:/private
-      - ../../backend/plugins/fastqc/tests/fastq:/input
-      - ../../backend/plugins/fastqc/tests/output:/output
+      - ../../backend/plugins/multiqc/tests/multiqc:/input
+      - ../../backend/plugins/multiqc/tests/output:/output
     depends_on:
       rabbitmq:
         condition: service_healthy

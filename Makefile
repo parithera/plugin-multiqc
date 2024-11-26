@@ -3,7 +3,7 @@
 .PHONY        = help build build-prod up down logs test
 
 KIND = plugin
-NAME = fastqc
+NAME = multiqc
 REPOSITORY = parithera/$(KIND)-$(NAME)
 
 ## —— 🦉 CodeClarity's plugin Makefile 🦉 ——————————————————————————————————

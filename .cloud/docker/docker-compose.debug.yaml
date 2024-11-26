@@ -1,8 +1,8 @@
 services:
-  plugin-fastqc:
+  plugin-multiqc:
     # For dev we keep the golang container and install devtools
     build:
       target: plugin-debug
-    image: parithera/fastqc-debug:latest
+    image: parithera/multiqc-debug:latest
     ports:
       - 40000:40000

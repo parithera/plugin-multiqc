@@ -1,4 +1,4 @@
-module github.com/parithera/plugin-fastqc
+module github.com/parithera/plugin-multiqc
 
 go 1.22.0
 

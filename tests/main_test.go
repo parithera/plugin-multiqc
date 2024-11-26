@@ -8,7 +8,7 @@ import (
 
 	dbhelper "github.com/CodeClarityCE/utility-dbhelper/helper"
 	codeclarity "github.com/CodeClarityCE/utility-types/codeclarity_db"
-	plugin "github.com/parithera/plugin-fastqc/src"
+	plugin "github.com/parithera/plugin-multiqc/src"
 	"github.com/stretchr/testify/assert"
 	"github.com/uptrace/bun"
 	"github.com/uptrace/bun/dialect/pgdialect"
