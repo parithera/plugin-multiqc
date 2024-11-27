@@ -9,16 +9,13 @@ FROM golang:1.23.0-alpine AS plugin-dev
 ARG KIND
 ARG PLUGINNAME
 
-WORKDIR /
-RUN wget https://www.bioinformatics.babraham.ac.uk/projects/fastqc/fastqc_v0.12.1.zip
-RUN unzip fastqc_v0.12.1.zip
-RUN rm fastqc_v0.12.1.zip
-RUN ln -s /FastQC/fastqc /usr/local/bin/fastqc
 
 WORKDIR /codeclarity/${KIND}/${PLUGINNAME}
 ADD .cloud/docker/config/* /root
-RUN apk add --no-cache git msttcorefonts-installer fontconfig openjdk21-jre perl
-RUN update-ms-fonts
+RUN apk add --no-cache git python3 py3-pip
+RUN apk add --no-cache --virtual .build_deps build-base libffi-dev python3-dev gcc libc-dev
+RUN pip3 install --no-cache --break-system-packages multiqc
+RUN apk del .build_deps
 
 RUN go install github.com/air-verse/air@latest
 CMD air -c .air.toml
@@ -30,16 +27,12 @@ ARG PLUGINNAME
 ENV KIND ${KIND}
 ENV PLUGINNAME ${PLUGINNAME}
 
-WORKDIR /
-RUN wget https://www.bioinformatics.babraham.ac.uk/projects/fastqc/fastqc_v0.12.1.zip
-RUN unzip fastqc_v0.12.1.zip
-RUN rm fastqc_v0.12.1.zip
-RUN ln -s /FastQC/fastqc /usr/local/bin/fastqc
-
 WORKDIR /codeclarity/${KIND}/${PLUGINNAME}
 ADD .cloud/docker/config/* /root
-RUN apk add --no-cache git msttcorefonts-installer fontconfig openjdk21-jre perl
-RUN update-ms-fonts
+RUN apk add --no-cache git python3 py3-pip
+RUN apk add --no-cache --virtual .build_deps build-base libffi-dev python3-dev gcc libc-dev
+RUN pip3 install --no-cache --break-system-packages multiqc
+RUN apk del .build_deps
 
 RUN go install github.com/go-delve/delve/cmd/dlv@latest
 ADD .cloud/docker/config/* /root
