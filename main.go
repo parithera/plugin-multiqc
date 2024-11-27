@@ -78,7 +78,8 @@ func main() {
 func startAnalysis(args Arguments, dispatcherMessage types_amqp.DispatcherPluginMessage, config plugin_db.Plugin, analysis_document codeclarity.Analysis) (map[string]any, codeclarity.AnalysisStatus, error) {
 
 	// Get analysis config
-	messageData := analysis_document.Config[config.Name].(map[string]any)
+	// We use the same as the one from fastqc
+	messageData := analysis_document.Config["fastqc"].(map[string]any)
 
 	// GET download path from ENV
 	path := os.Getenv("DOWNLOAD_PATH")

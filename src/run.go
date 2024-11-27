@@ -1,11 +1,9 @@
 package js
 
 import (
-	"log"
 	"os"
 	"os/exec"
 	"path"
-	"path/filepath"
 	"time"
 
 	codeclarity "github.com/CodeClarityCE/utility-types/codeclarity_db"
@@ -34,22 +32,16 @@ func Start(sourceCodeDir string, codeclarityDB *bun.DB) types.Output {
 func ExecuteScript(sourceCodeDir string) types.Output {
 	start := time.Now()
 
-	files, err := filepath.Glob(sourceCodeDir + "/*.fastq.gz")
-	if err != nil {
-		log.Fatal(err)
-	}
-
-	if len(files) == 0 {
-		return generate_output(start, "no fastq file", codeclarity.SUCCESS, []exceptionManager.Error{})
-	}
-	outputPath := path.Join(sourceCodeDir, "fastqc")
+	outputPath := path.Join(sourceCodeDir, "multiqc")
 	os.MkdirAll(outputPath, os.ModePerm)
 
-	args := append([]string{"-o", outputPath, "-t", "1"}, files...)
+	fastqcPath := path.Join(sourceCodeDir, "fastqc")
+
+	args := []string{"-o", outputPath, fastqcPath}
 
 	// Run Rscript in sourceCodeDir
-	cmd := exec.Command("fastqc", args...)
-	_, err = cmd.CombinedOutput()
+	cmd := exec.Command("multiqc", args...)
+	_, err := cmd.CombinedOutput()
 	if err != nil {
 		// panic(fmt.Sprintf("Failed to run Rscript: %s", err.Error()))
 		codeclarity_error := exceptionManager.Error{
