@@ -36,8 +36,10 @@ func ExecuteScript(sourceCodeDir string) types.Output {
 	os.MkdirAll(outputPath, os.ModePerm)
 
 	fastqcPath := path.Join(sourceCodeDir, "fastqc")
+	fastpPath := path.Join(sourceCodeDir, "fastp")
+	starPath := path.Join(sourceCodeDir, "STAR")
 
-	args := []string{"-o", outputPath, fastqcPath}
+	args := []string{"-o", outputPath, fastqcPath, fastpPath, starPath}
 
 	// Run Rscript in sourceCodeDir
 	cmd := exec.Command("multiqc", args...)
