@@ -9,7 +9,6 @@ FROM golang:1.23.0-alpine AS plugin-dev
 ARG KIND
 ARG PLUGINNAME
 
-
 WORKDIR /codeclarity/${KIND}/${PLUGINNAME}
 ADD .cloud/docker/config/* /root
 RUN apk add --no-cache git python3 py3-pip
@@ -58,8 +57,16 @@ FROM alpine:3.20.2 AS plugin
 ARG KIND
 ARG USERNAME
 ARG PLUGINNAME
-RUN adduser -D ${USERNAME}
+
+RUN apk add --no-cache git python3 py3-pip
+RUN apk add --no-cache --virtual .build_deps build-base libffi-dev python3-dev gcc libc-dev
+RUN pip3 install --no-cache --break-system-packages multiqc
+RUN apk del .build_deps
+
+RUN addgroup -S ${USERNAME} --gid 1001 && adduser -S ${USERNAME} -G ${USERNAME} --uid 1001 -D
+# RUN adduser -D ${USERNAME}
 USER ${USERNAME}
+
 WORKDIR /home/${USERNAME}/${PLUGINNAME}
 COPY --from=plugin-build --chown=codeclarity:codeclarity /codeclarity/${KIND}/${PLUGINNAME}/plugin .
 COPY --from=plugin-build --chown=codeclarity:codeclarity /codeclarity/${KIND}/${PLUGINNAME}/config.json .
