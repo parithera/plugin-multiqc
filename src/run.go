@@ -1,4 +1,4 @@
-package js
+package multiqc
 
 import (
 	"os"
@@ -14,38 +14,29 @@ import (
 	"github.com/parithera/plugin-multiqc/src/utils/output_generator"
 )
 
-// Start is a function that analyzes the source code directory and generates a software bill of materials (SBOM) output.
-// It returns an sbomTypes.Output struct containing the analysis results.
+// Start is the main entry point for executing the MultiQC script.
+// It takes the source code directory and a CodeClarity DB connection as input.
 func Start(sourceCodeDir string, codeclarityDB *bun.DB) types.Output {
-
-	// r_config, ok := analysis.Config["fastqc"].(map[string]interface{})
-	// if !ok {
-	// 	panic("Failed to fetch analysis config")
-	// }
-
-	// projectId := r_config["project"].(string)
-
-	return ExecuteScript(sourceCodeDir)
-
+	return ExecuteScript(sourceCodeDir) // Calls the ExecuteScript function to perform the analysis.
 }
 
+// ExecuteScript executes the MultiQC script in the specified directory.
+// It handles the creation of the output directory and the execution of the MultiQC command.
 func ExecuteScript(sourceCodeDir string) types.Output {
-	start := time.Now()
+	start := time.Now() // Records the start time of the analysis.
 
-	outputPath := path.Join(sourceCodeDir, "multiqc")
-	os.MkdirAll(outputPath, os.ModePerm)
+	outputPath := path.Join(sourceCodeDir, "multiqc") // Defines the output directory for MultiQC.
+	os.MkdirAll(outputPath, os.ModePerm)              // Creates the output directory if it doesn't exist.
 
-	fastqcPath := path.Join(sourceCodeDir, "fastqc")
-	fastpPath := path.Join(sourceCodeDir, "fastp")
-	starPath := path.Join(sourceCodeDir, "STAR")
+	fastqcPath := path.Join(sourceCodeDir, "fastqc") // Defines the path to the FastQC directory.
+	fastpPath := path.Join(sourceCodeDir, "fastp")   // Defines the path to the FastP directory.
+	starPath := path.Join(sourceCodeDir, "STAR")     // Defines the path to the STAR directory.
 
-	args := []string{"-o", outputPath, fastqcPath, fastpPath, starPath}
-
+	args := []string{"-o", outputPath, fastqcPath, fastpPath, starPath} // Constructs the command-line arguments for MultiQC.
 	// Run Rscript in sourceCodeDir
-	cmd := exec.Command("multiqc", args...)
-	_, err := cmd.CombinedOutput()
+	cmd := exec.Command("multiqc", args...) // Creates an exec.Command object to run the MultiQC command.
+	_, err := cmd.CombinedOutput()          // Executes the command and captures the combined output (stdout and stderr).
 	if err != nil {
-		// panic(fmt.Sprintf("Failed to run Rscript: %s", err.Error()))
 		codeclarity_error := exceptionManager.Error{
 			Private: exceptionManager.ErrorContent{
 				Description: err.Error(),
@@ -56,27 +47,29 @@ func ExecuteScript(sourceCodeDir string) types.Output {
 				Type:        exceptionManager.GENERIC_ERROR,
 			},
 		}
-		return generate_output(start, nil, codeclarity.FAILURE, []exceptionManager.Error{codeclarity_error})
+		return generate_output(start, nil, codeclarity.FAILURE, []exceptionManager.Error{codeclarity_error}) // Returns an output with the error information.
 	}
 
-	return generate_output(start, "done", codeclarity.SUCCESS, []exceptionManager.Error{})
+	return generate_output(start, "done", codeclarity.SUCCESS, []exceptionManager.Error{}) // Returns an output indicating successful completion.
 }
 
+// generate_output formats the analysis results into a types.Output struct.
+// It includes the analysis timing, status, and any errors that occurred.
 func generate_output(start time.Time, data any, status codeclarity.AnalysisStatus, errors []exceptionManager.Error) types.Output {
-	formattedStart, formattedEnd, delta := output_generator.GetAnalysisTiming(start)
+	formattedStart, formattedEnd, delta := output_generator.GetAnalysisTiming(start) // Gets the analysis timing information.
 
 	output := types.Output{
 		Result: types.Result{
-			Data: data,
+			Data: data, // The analysis data.
 		},
 		AnalysisInfo: types.AnalysisInfo{
-			Errors: errors,
+			Errors: errors, // Any errors that occurred during the analysis.
 			Time: types.Time{
-				AnalysisStartTime: formattedStart,
-				AnalysisEndTime:   formattedEnd,
-				AnalysisDeltaTime: delta,
+				AnalysisStartTime: formattedStart, // The start time of the analysis.
+				AnalysisEndTime:   formattedEnd,   // The end time of the analysis.
+				AnalysisDeltaTime: delta,          // The duration of the analysis.
 			},
-			Status: status,
+			Status: status, // The status of the analysis (success or failure).
 		},
 	}
 	return output
