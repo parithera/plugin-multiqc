@@ -1,1 +1,1 @@
-multiqc==1.27.1
+multiqc==1.29
