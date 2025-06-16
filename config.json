@@ -1,6 +1,6 @@
 {
   "name": "multiqc",
-  "version": "v0.0.3-alpha",
+  "version": "v0.0.4-alpha",
   "image_name": "parithera/plugin-multiqc",
   "depends_on": ["fastqc", "fastp", "star"],
   "description": "A plugin to run an R script",
